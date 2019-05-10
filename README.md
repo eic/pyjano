@@ -68,9 +68,9 @@ Working with configurations:
 jana.configure(yaml_file='config.yaml')   # BTW, configure method completely overwrites 
 jana.configure(json_file='config.json')   # previous configurations. 
 
-jana.append(plugins=['csv_writer'])      # append just updates the existing configurations 
-jana.run(nthreads=4)                      # might be convenient too
-jana.config.update(other_jana.config)     # why not?
+jana.append(plugins=['csv_writer'])      # append updates the previous configuration 
+jana.run(nthreads=4)                     # might be convenient too
+jana.config.update(other_jana.config)    # why not?
  
 ```
 
