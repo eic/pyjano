@@ -1,8 +1,13 @@
 # janapy
 
-https://github.com/JeffersonLab/JANA2
+![JANAPY](logo.png) 
 
-jana2 configuration and control in python
+*Serve [jana2](https://github.com/JeffersonLab/JANA2) fresh and tasty*
+
+
+
+
+## jana2 configuration and control in python
 
 ```python
 import janapy
