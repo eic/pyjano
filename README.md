@@ -65,10 +65,10 @@ Working with configurations:
 ```python
 
 # Use yaml or JSON
-jana.configure(yaml_file='config.yaml')   # BTW, configure method completely overwrites 
-jana.configure(json_file='config.json')   # previous configurations. 
+jana.configure(yaml_file='config.yaml')   # BTW, configure method completely overwrites the previous configuration  
+jana.configure(json_file='config.json')
 
-jana.append(plugins=['csv_writer'])      # append updates the previous configuration 
+jana.append(plugins=['csv_writer'])      # append updates the configuration 
 jana.run(nthreads=4)                     # might be convenient too
 jana.config.update(other_jana.config)    # why not?
  
