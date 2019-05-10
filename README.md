@@ -5,7 +5,9 @@
 *Serve [jana2](https://github.com/JeffersonLab/JANA2) fresh and tasty*
 
 
-
+```bash
+pip install janapy
+```
 
 ## jana2 configuration and control in python
 
