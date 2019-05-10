@@ -18,13 +18,13 @@ jana = janapy.create()   # Find jana automatically but it will not work in many 
                          # create('/path/to/exe') overload should solve this
 
 jana.configure(        
-        plugins=[                      # a list of plugins to use:
+        plugins=[                        # a list of plugins to use:
             'beagle_reader',             # plugin name, no additional parameters
             {'vmeson': {'verbose': 2}}], # add vmeson plugin & set '-Pvmeson:verbose=2' parameter
             
-        input="/file/to/process.dat",   # or [list, of, files]
+        input="/file/to/process.dat",    # or [list, of, files]
                                                  
-        params={                        # for parameters that don't follow <plugin>:<name> naming                        
+        params={                         # for parameters that don't follow <plugin>:<name> naming                        
             'debug_plugin_load': True,   # will work as -Pdebug_plugin_load=1
             'WhateverParam': 42,         # the same here -PWhateverParam        
             'nthreads': 8                # Smart enough to run it like --nthreads=8
