@@ -17,8 +17,7 @@ import janapy
 jana = janapy.create()   # Find jana automatically but it will not work in many cases, so 
                          # create('/path/to/exe') overload should solve this
 
-jana.configure(
-        
+jana.configure(        
         plugins:[                        # a list of plugins to use:
             'beagle_reader',             # plugin name, no additional parameters
             {'vmeson': {'verbose': 2}}], # add vmeson plugin & set '-Pvmeson:verbose=2' parameter
