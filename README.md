@@ -14,8 +14,8 @@ pip install janapy
 ```python
 import janapy
 
-jana = janapy.create()   # Find jana automatically but create('/path/to/jana') is possible too
-                         # And even create(env='HD_SIM_HOME') is possible
+jana = janapy.create()   # Find jana automatically but it will not work in many cases, so 
+                         # create('/path/to/exe') overload should solve this
 
 jana.configure(
         
