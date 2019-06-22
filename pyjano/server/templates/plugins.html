@@ -1,0 +1,136 @@
+{% if layout == 'full' %}
+    {% extends 'layout_full.html' %}
+{% elif layout == 'short' %}
+    {% extends 'layout_short.html' %}
+{% endif -%}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <p class="card-text"><strong>IO plugins:</strong></p>
+                    <!-- add class p-switch -->
+                    <ul class="list-group list-group-flush" role="tablist">
+                        {% for plugin in plugins if plugin['type']=='reader' %}
+                            <li class="list-group-item info-source" data-name="{{ plugin['name'] }}" id="{{ plugin['name'] }}_li">
+                                <div class="pretty p-switch">
+                                    <input type="checkbox" class="plugin-checkbox"/>
+                                    <div class="state"><label></label></div>
+                                </div>
+                                <label>{{ plugin['name'] }}</label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <p class="card-text"><strong>Process & Analysis:</strong></p>
+                    <!-- add class p-switch -->
+                    <ul class="list-group list-group-flush" role="tablist">
+                        {% for plugin in plugins if plugin['type']!='reader' %}
+                            <li class="list-group-item info-source" data-name="{{ plugin['name'] }}" id="{{ plugin['name'] }}_li">
+                                <div class="pretty p-switch">
+                                    <input type="checkbox" class="plugin-checkbox"/>
+                                    <div class="state"><label></label></div>
+                                </div>
+                                <label>{{ plugin['name'] }}</label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                {% for plugin in plugins %}
+                    <ul class="plugin-config-set list-group list-group-flush" id="{{ plugin['name'] }}-config-set" style="display: none">
+                        {% for pconfig in plugin['config'] %}
+                        <li class="plugin-config list-group-item config-info-source" data-name="{{ plugin['name'] }}---{{ pconfig['name'] }}" id="{{ pconfig['name'] }}_config">
+                            <div class="row">
+                                <div class="input-group input-group-sm mb-3 col-sm-4">
+                                    <div class="input-group-prepend">
+                                       <div class="input-group-text">
+                                          <input type="checkbox" aria-label="Checkbox for following text input">
+                                       </div>
+                                    </div>
+                                    <input type="text" class="form-control" value="{{ pconfig['value'] }}" >
+                                </div>
+                                <div class="col-sm-8">
+                                     {{ pconfig['name'] }} ({{ pconfig['type'] }})
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>{# initial content #}
+    <div class="row">
+        <div class="col-12">
+            {% for plugin in plugins%}
+                <div class="help-view" style="display: none" data-name="{{ plugin['name'] }}" id="{{ plugin['name'] }}-help">Plugin <strong>{{ plugin['name'] }}: &nbsp;</strong>{{ plugin['help'] }}</div>
+                {% for pconfig in plugin['config'] %}
+                    <div class="help-view" style="display: none" data-name="{{ plugin['name'] }}" id="{{ plugin['name'] }}---{{ pconfig['name'] }}-help">Config <strong>{{ plugin['name'] }}:{{ pconfig['name'] }}</strong>: &nbsp;{{ pconfig['help'] }}</div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block end_script %}
+<script>
+    let plugins = [
+        {'info-source': {
+            'sel':0
+            }}
+    ];
+    function ClearInfoClass() {
+        $('.info-source').removeClass('bg-light')
+    }
+
+    function ClearConfigInfoClass() {
+        $('.config-info-source').removeClass('bg-light')
+    }
+
+    function HideDocumentation() {
+        $('.help-view').hide()
+    }
+
+    function HideConfigs() {
+        $('.plugin-config-set').hide()
+    }
+
+$(document).ready(function(){
+
+    console.log('plugins template initialized');
+    $('.info-source').click(function() {
+        ClearInfoClass();
+        ClearConfigInfoClass();
+        HideDocumentation();
+        HideConfigs();
+        $(this).addClass('bg-light');
+        let pluginName = $(this).data("name");
+        $(`#${pluginName}-help`).show();
+        $(`#${pluginName}-config-set`).show();
+    });
+    $('.config-info-source').click(function() {
+        ClearInfoClass();
+        ClearConfigInfoClass();
+        HideDocumentation();
+        $(this).addClass('bg-light');
+        let pluginName = $(this).data("name");
+        $(`#${pluginName}-help`).show();
+        $(`#${pluginName}-config-set`).show();
+    });
+});
+</script>
+{% endblock %}

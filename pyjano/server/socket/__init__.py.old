@@ -1,0 +1,6 @@
+from flask import Blueprint
+from . import routes, events
+
+socket = Blueprint('socket', __name__)
+
+
