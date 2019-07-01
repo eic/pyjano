@@ -3,17 +3,13 @@ import os
 from time import sleep
 
 import click
-from IPython import get_ipython
-from IPython.display import IFrame
-from IPython.display import display, Javascript, clear_output, HTML
+
 from ipywidgets import Button, IntProgress, HBox
-
-
 
 
 def is_notebook():
     try:
-
+        from IPython import get_ipython
         shell = get_ipython().__class__.__name__
         if shell == 'ZMQInteractiveShell':
             return True  # Jupyter notebook or qtconsole
@@ -42,6 +38,7 @@ def gen(max):
 
 class ControlWidget:
     def __init__(self, sequence, size=None, every=None, name='Events'):
+        from IPython.display import display, Javascript, clear_output, HTML
         self.__button = Button(description='Run', icon='play')
         self.__progress = IntProgress(min=0, max=1, value=0)
         self.__label = HTML()
@@ -118,6 +115,7 @@ class ControlWidget:
             self.__progress.bar_style = ''
 
     def draw(self):
+        from IPython.display import display
         display(self.__box)
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
@@ -8,6 +9,11 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         return super(CORSRequestHandler, self).end_headers()
 
+if __name__ == '__main__':
 
-httpd = HTTPServer(('localhost', 8008), CORSRequestHandler)
-httpd.serve_forever()
+    port = 5000
+    if len(sys.argv) > 1:
+        port=int(sys.argv[1])
+
+    httpd = HTTPServer(('localhost', port), CORSRequestHandler)
+    httpd.serve_forever()
