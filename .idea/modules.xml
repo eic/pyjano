@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/janapy.iml" filepath="$PROJECT_DIR$/.idea/janapy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../epw/.idea/epw.iml" filepath="$PROJECT_DIR$/../epw/.idea/epw.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/pyjano.iml" filepath="$PROJECT_DIR$/.idea/pyjano.iml" />
     </modules>
   </component>
 </project>

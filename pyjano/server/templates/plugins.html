@@ -109,28 +109,39 @@
         $('.plugin-config-set').hide()
     }
 
-$(document).ready(function(){
+    function activatePluginsGui() {
+        console.log('plugins template initialized');
+        $('.info-source').click(function() {
+            ClearInfoClass();
+            ClearConfigInfoClass();
+            HideDocumentation();
+            HideConfigs();
+            $(this).addClass('bg-light');
+            let pluginName = $(this).data("name");
+            $(`#${pluginName}-help`).show();
+            $(`#${pluginName}-config-set`).show();
+        });
+        $('.config-info-source').click(function() {
+            ClearInfoClass();
+            ClearConfigInfoClass();
+            HideDocumentation();
+            $(this).addClass('bg-light');
+            let pluginName = $(this).data("name");
+            $(`#${pluginName}-help`).show();
+            $(`#${pluginName}-config-set`).show();
+        });
+    }
 
-    console.log('plugins template initialized');
-    $('.info-source').click(function() {
-        ClearInfoClass();
-        ClearConfigInfoClass();
-        HideDocumentation();
-        HideConfigs();
-        $(this).addClass('bg-light');
-        let pluginName = $(this).data("name");
-        $(`#${pluginName}-help`).show();
-        $(`#${pluginName}-config-set`).show();
-    });
-    $('.config-info-source').click(function() {
-        ClearInfoClass();
-        ClearConfigInfoClass();
-        HideDocumentation();
-        $(this).addClass('bg-light');
-        let pluginName = $(this).data("name");
-        $(`#${pluginName}-help`).show();
-        $(`#${pluginName}-config-set`).show();
-    });
-});
+    if(typeof jQuery=='undefined') {
+        var headTag = document.getElementsByTagName("head")[0];
+        var jqTag = document.createElement('script');
+        jqTag.type = 'text/javascript';
+        jqTag.src = '/static/jsroot/libs/jquery.js';
+        jqTag.onload = activatePluginsGui;
+        headTag.appendChild(jqTag);
+    } else {
+         activatePluginsGui();
+    }
+
 </script>
 {% endblock %}

@@ -3,10 +3,26 @@ import os
 from time import sleep
 
 import click
+from IPython import get_ipython
 from IPython.display import IFrame
 from IPython.display import display, Javascript, clear_output, HTML
 from ipywidgets import Button, IntProgress, HBox
 
+
+
+
+def is_notebook():
+    try:
+
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True  # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False  # Probably standard Python interpreter
 
 @click.group(invoke_without_command=True)
 @click.option('--debug/--no-debug', default=False)
@@ -104,108 +120,6 @@ class ControlWidget:
     def draw(self):
         display(self.__box)
 
+if __name__ == "__main__":
+    print(is_notebook())
 
-
-class Jana(object):
-
-    def __init__(self):
-        self.config = {}
-
-    def configure(self, plugins=None, flags=None, in_files=None, params=''):
-        if plugins:
-            self.config['plugins'] = plugins
-        if flags:
-            self.config['flags'] = flags
-        if in_files:
-            self.config['input_files'] = in_files
-
-
-        """
-        <script src="integrity="sha256-BTlTdQO9/fascB1drekrDVkaKd9PkwBymMlHOiG+qLI=" crossorigin="anonymous"></script>
-		"""
-
-        script = """
-            window.onload = function() {
-                if (window.jQuery) {  
-                    // jQuery is loaded  
-                    console.log("Yeah!");
-                } else {
-                    // jQuery is not loaded
-                    console.log("Doesn't Work");
-                }
-            }
-        """
-
-        # noinspection PyTypeChecker
-        display(Javascript('console.log("hello world")', lib='https://code.jquery.com/jquery-3.4.1.slim.js'))
-        clear_output()
-        display(HTML('<b>JANA</b> loaded...'))
-
-    def plugins_gui(self):
-
-        display(IFrame('http://127.0.0.1:5000', width='100%', height=550))
-
-    def start_gui(self):
-        display(IFrame('http://127.0.0.1:5000/start', width='100%', height=170))
-
-    def run(self):
-        sleep(3)
-        display(HTML(
-
-            """
-            ejana -Pplugins=hepmc_reader,open_charm -Popen_charm:smearing=1 -Pnevents=1000  /home/romanov/ceic/data/herwig6_e-p_5x100.hepmc
-getcwd: /mnt/c/eic/pyjano_proto
-[INFO] Adding source: /home/romanov/ceic/data/herwig6_e-p_5x100.hepmc
-
-[INFO] Initializing plugin "/home/romanov/eic/ejana/dev/compiled/plugins/hepmc_reader.so"
-[INFO] Initializing plugin "/home/romanov/eic/ejana/dev/compiled/plugins/open_charm.so"
-Suppressed exception in JEventSourceManager::GetUserEventSourceGenerator!
-Opening source "/home/romanov/ceic/data/herwig6_e-p_5x100.hepmc" - JEventSource_hepmc : BeAGLE generated Text file
-JEventSource_hepmc: Opening TXT file /home/romanov/ceic/data/herwig6_e-p_5x100.hepmc
-[INFO] Creating 8 processing threads ...
-
-                    Config. Parameters
-  =======================================================
-             name                          value
-  --------------------------   --------------------------
-                    AFFINITY = 0
-   JANA:DEBUG_PLUGIN_LOADING = 0
-    JANA:DEBUG_THREADMANAGER = 0
-   JANA:MAX_NUM_OPEN_SOURCES = 1
-      JANA:QUEUE_DEBUG_LEVEL = 0
-   JANA:TASK_POOL_DEBUGLEVEL = 0
-         JANA:TASK_POOL_SIZE = 200
-     JANA:THREAD_DEBUG_LEVEL = 0
-  JANA:THREAD_ROTATE_SOURCES = 1
-   JANA:THREAD_SLEEP_TIME_NS = 100
-                     nevents = 1000
-                       nskip = 0
-                    NTHREADS = 8
-         open_charm:smearing = 1
-                     plugins = hepmc_reader,open_charm
-     ROOT:EnableThreadSafety = 1
-
-Start processing ...
-OpenCharmProcessor: Init()
-
---------- EVENT 0 ---------
-All threads have ended.  263.8 Hz (399.8 Hz avg)
-Event processing ended.
-OpenCharmProcessor::Finish(). Cleanup
-
-Final Report
-------------------------------------------------------------------------------
-Source                                              Nevents  Queue   NTasks
-------------------------------------------------------------------------------
-/home/romanov/ceic/data/herwig6_e-p_5x100.hepmc        1000  Events  999
-
-Total events processed: 1000 (~ 1000.0 evt)
-Integrated Rate: 395.5 Hz
-
-[INFO] JResourcePoolSimple<JFactorySet>::~JResourcePool: Deleted 8 items (8 expected).
-
-            """.replace('\n', '<br>').replace('INFO', '<span style="color:blue">INFO</span>')
-        ))
-
-if __name__ == '__main__':
-    ejpm_cli()

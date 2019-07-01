@@ -1,4 +1,4 @@
-# janapy
+:# janapy
 
 ![JANAPY](logo.png) 
 

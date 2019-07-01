@@ -1,3 +1,7 @@
+import inspect
+import os
+
+import jinja2
 from flask import session, redirect, url_for, render_template, request
 from flask import Blueprint
 from flask import Markup
@@ -18,43 +22,40 @@ plugins = [
     {'name': 'open_charm', 'type': ''},
 ]
 
-
-@jana_blueprint.route('/', methods=['GET', 'POST'])
-def index():
-    """Login form to enter a room."""
-
+def prepare_plugins():
     for plugin in plugins:
         plugin['help'] = plugin['name'] + " help"
         plugin['config'] = [
-            {'name':'verbose', 'type': 'int', 'value':0, 'help':Markup('verbosity level: 0 - silent, 2 - print all')}
+            {'name': 'verbose', 'type': 'int', 'value': 0, 'help': Markup('verbosity level: 0 - silent, 2 - print all')}
         ]
 
-    plugins_by_name = {p['name']:p for p in plugins}
+    plugins_by_name = {p['name']: p for p in plugins}
     plugins_by_name['beagle_reader']['help'] = Markup("""
-    Opens files from BeAGLE event generator as a data source<br>
-    <strong>BeAGLE</strong> - <strong>Be</strong>nchmark <strong>eA</strong> <strong>G</strong>enerator for <strong>LE</strong>ptoproduction 
-    <br>
-    <a href="https://wiki.bnl.gov/eic/index.php/BeAGLE" target='_blank'>Documentation</a>
-    
-    """)
+       Opens files from BeAGLE event generator as a data source<br>
+       <strong>BeAGLE</strong> - <strong>Be</strong>nchmark <strong>eA</strong> <strong>G</strong>enerator for <strong>LE</strong>ptoproduction 
+       <br>
+       <a href="https://wiki.bnl.gov/eic/index.php/BeAGLE" target='_blank'>Documentation</a>
+
+       """)
 
     plugins_by_name['lund_reader']['help'] = Markup("""
-    Opens files in LUND format.
-    <p>It is a text format. Its header defines quantities such as the number N of generated particle for each event and other kinematic properties.
-    <p><a href="https://gemc.jlab.org/gemc/html/documentation/generator/lund.html"> More info </a>
-    """)
+       Opens files in LUND format.
+       <p>It is a text format. Its header defines quantities such as the number N of generated particle for each event and other kinematic properties.
+       <p><a href="https://gemc.jlab.org/gemc/html/documentation/generator/lund.html"> More info </a>
+       """)
 
     plugins_by_name['open_charm']['help'] = Markup("""
-        Makes analysis on charm particles. Extracting basic invariant masses and other parameters with or without smearing
-        """)
+           Makes analysis on charm particles. Extracting basic invariant masses and other parameters with or without smearing
+           """)
 
     plugins_by_name['open_charm']['config'].extend(
 
-            [
-                {'name': 'smearing_source', 'type': 'int', 'value': 1, 'help': Markup('Smearing type: 0 - no, 1 - basic, 2 - eic-smear, 3 ')},
-                {'name': 'eEnergy', 'type': 'float', 'value': 5, 'help': Markup('electron beam energy GeV')},
-                {'name': 'iEnergy', 'type': 'float', 'value': 50, 'help': Markup('ion beam energy GeV ')},
-            ]
+        [
+            {'name': 'smearing_source', 'type': 'int', 'value': 1,
+             'help': Markup('Smearing type: 0 - no, 1 - basic, 2 - eic-smear, 3 ')},
+            {'name': 'eEnergy', 'type': 'float', 'value': 5, 'help': Markup('electron beam energy GeV')},
+            {'name': 'iEnergy', 'type': 'float', 'value': 50, 'help': Markup('ion beam energy GeV ')},
+        ]
     )
 
     plugins_by_name['lund_reader']['config'].append(
@@ -64,7 +65,29 @@ def index():
 
     )
 
-    return render_template('plugins.html', layout="short", plugins=plugins)
+    return plugins
+
+@jana_blueprint.route('/', methods=['GET', 'POST'])
+def index():
+    """Login form to enter a room."""
+
+
+
+    return render_template('plugins.html', layout="short", plugins=prepare_plugins())
+
+
+def render_jinja_html(template_loc, file_name, **context):
+    return jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template_loc + '/')
+    ).get_template(file_name).render(context)
+
+
+def offline_render():
+    templates_dir = os.path.join(os.path.dirname(inspect.stack()[0][1]), 'templates')
+    return render_jinja_html(templates_dir, 'plugins.html', plugins=prepare_plugins())
+
+
+
 #
 #
 @jana_blueprint.route('/full', methods=['GET', 'POST'])
@@ -110,7 +133,6 @@ def full():
 
         {'name': 'smearing_source', 'type': 'int', 'value': 1,
          'help': Markup('Smearing type: 0 - no, 1 - basic, 2 - eic-smear, 3 ')}
-
     )
 
     return render_template('plugins.html', layout="full", plugins=plugins)
@@ -131,3 +153,7 @@ def chat():
     if name == '' or room == '':
         return redirect(url_for('.index'))
     return render_template('chat.html', name=name, room=room)
+
+
+if __name__ == "__main__":
+    print(offline_render())
