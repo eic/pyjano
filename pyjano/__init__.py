@@ -21,7 +21,7 @@ def is_notebook():
         return False  # Probably standard Python interpreter
 
 
-def enable_interactive_rootjs():
+def enable_interactive_jsroot():
     """Fixes CERN.root issue with requirejs in Jupyterlab
     https://github.com/root-project/jsroot/issues/166
     """
