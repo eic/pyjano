@@ -153,7 +153,7 @@ class Jana(object):
 
         self.runner = None
 
-        self.exec_path = '/home/romanov/eic/ejana/dev/compiled/bin/ejana'
+        self.exec_path = 'ejana'
         self.plugin_search_paths = [
             '/home/romanov/eic/ejana/dev/compiled/plugins',
             '/home/romanov/eic/jana/jana-greenfield/plugins'
@@ -315,13 +315,14 @@ class Jana(object):
         flags_str = " ".join([flag for flag in self.config['flags']])
         return f'{add_plugins_str} {plugins_params_str} {params_str}  {files_str} {flags_str}'
 
+
 if __name__ == "__main__":
     jana = Jana()
     jana.configure(
         plugins=[  # a list of plugins to use:
-            'beagle_reader',  # plugin name, no additional parameters
-            {'open_charm': {  # add vmeson plugin & set '-Pvmeson:verbose=2' parameter
-                'verbose': 1,  # Set verbose mode for that plugin
+            'beagle_reader',    # plugin name, no additional parameters
+            {'open_charm': {    # add vmeson plugin & set '-Pvmeson:verbose=2' parameter
+                'verbose': 1,   # Set verbose mode for that plugin
                 'smearing': 1}  # Set smearing mode
             },
         ],

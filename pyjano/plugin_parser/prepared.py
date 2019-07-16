@@ -2,13 +2,14 @@
 from markupsafe import Markup
 
 plugins = [
-    {'name': 'jana', 'type': 'reader'},
+
     {'name': 'lund_reader', 'type': 'reader'},
     {'name': 'beagle_reader', 'type': 'reader'},
     {'name': 'hepmc_reader', 'type': 'reader'},
     {'name': 'jleic_geant_reader', 'type': 'reader'},
     {'name': 'jleic_gemc_reader', 'type': 'reader'},
-    {'name': 'trk_fit', 'type': ''},
+    {'name': 'jana', 'type': ''},
+    {'name': 'eic_smear', 'type': ''},
     {'name': 'trk_eff', 'type': ''},
     {'name': 'jleic_iff', 'type': ''},
     {'name': 'jleic_occupancy', 'type': ''},
@@ -61,6 +62,7 @@ def prepare_plugins():
        <p><a href="https://gemc.jlab.org/gemc/html/documentation/generator/lund.html"> More info </a>
        """)
 
+    # === Open charm analysis === 
     plugins_by_name['open_charm']['help'] = Markup("""
            Makes analysis on charm particles. Extracting basic invariant masses and other parameters with or without smearing
            """)
