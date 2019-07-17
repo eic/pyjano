@@ -2,7 +2,6 @@
 from markupsafe import Markup
 
 plugins = [
-
     {'name': 'lund_reader', 'type': 'reader'},
     {'name': 'beagle_reader', 'type': 'reader'},
     {'name': 'hepmc_reader', 'type': 'reader'},
@@ -62,13 +61,12 @@ def prepare_plugins():
        <p><a href="https://gemc.jlab.org/gemc/html/documentation/generator/lund.html"> More info </a>
        """)
 
-    # === Open charm analysis === 
+    # === Open charm analysis ===
     plugins_by_name['open_charm']['help'] = Markup("""
            Makes analysis on charm particles. Extracting basic invariant masses and other parameters with or without smearing
            """)
 
     plugins_by_name['open_charm']['config'].extend(
-
         [
             {'name': 'smearing_source', 'type': 'int', 'value': 1,
              'help': Markup('Smearing type: 0 - no, 1 - basic, 2 - eic-smear, 3 ')},

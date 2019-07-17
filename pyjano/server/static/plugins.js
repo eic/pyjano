@@ -54,13 +54,39 @@ let plugins = [
         pluginsToConfig();
     }
 
+    function renderPythonConfiguration(plugins) {
+        let resulting_html = "";
+        for(let plugin of plugins) {
+
+            let args_str = `'${plugin.name}'`;   // a string with arguments for .plugin(...) function call
+
+            // Do we have plugin parameters?
+
+                for(let parameter of plugin.parameters) {
+                    let escaped_value = '';
+                    if(parameter.type === 'string') {
+                        escaped_value = `'${parameter.value}'`;
+                    }
+                    else {
+                        escaped_value = `${parameter.value}`;
+                    }
+                    args_str += `, '${parameter.name}'=${escaped_value}`
+                }
+
+            let api_calls_str = `.plugin(${args_str})`;
+            resulting_html += `${api_calls_str}</br>`;
+        }
+        $('.v-pills-python code').html(resulting_html);
+    }
+
     function pluginsToConfig() {
         let plugins = [];
         let plugins_by_name = {};
+
         $('.plugin-checkbox:checked').each(function() {
-            console.log(this);
-            plugins.push(this.dataset.name);
-            plugins_by_name[this.dataset.name] = {};
+            let plugin = {'name': this.dataset.name, 'parameters': [], 'parameters_by_name': {}};
+            plugins.push(plugin);
+            plugins_by_name[plugin.name] = plugin;
         });
 
         // plugin-param-checkbox plugin-param-input
@@ -68,28 +94,34 @@ let plugins = [
 
         let output = "";
         for(let plugin of plugins) {
-            let parameters = [];
-            let parameters_by_name = [];
-
             console.log(`Looking parameters for ${plugin}`);
 
-            $(`input.plugin-param-checkbox[data-plugin=${plugin}]:checked`).each(function() {
-                //console.log(this);
+            $(`input.plugin-param-checkbox[data-plugin=${plugin.name}]:checked`).each(function() {
                 let full_name = this.dataset.name;
-                parameters.push(full_name);
 
-                for (let parameter of parameters) {
-                    let value = $(`input.plugin-param-input[data-name='${parameter}']`).first().val();
-                    parameters_by_name[full_name] = value;
-                    output += `${full_name}=${value} `;
-                }
 
-                //console.log(this.dataset.name);
+                let param_input = $(`input.plugin-param-input[data-name='${full_name}']`).first();
+                console.log(param_input.val());
+                //param_input.
+                let parameter = {
+                    'full_name': full_name,
+                    'name': param_input.data('parname'),
+                    'type': param_input.data('plugintype'),
+                    'value': param_input.val()};
 
-                plugins_by_name[plugin].parameters = parameters_by_name;
+                plugin.parameters.push(parameter);
+                plugin.parameters_by_name[parameter.full_name] = parameter;
+                console.log('parameter');
+                console.log(parameter);
+
+                output += `${full_name}=${parameter.value}`;
             });
+
+
             output += plugin + " ";
         }
-        console.log(output);
+
+        renderPythonConfiguration(plugins);
+
         $('#config-help').text(output)
     }

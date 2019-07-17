@@ -67,6 +67,7 @@
                                            data-name="{{ plugin['name'] }}:{{ pconfig['name'] }}"
                                            data-parname="{{ pconfig['name'] }}"
                                            data-plugin="{{ plugin['name'] }}"
+                                           data-plugintype="{{ pconfig['type'] }}"
                                            data-type="param">
                                 </div>
                                 <div class="col-sm-8">
@@ -91,10 +92,22 @@
         </div>
     </div>
     <hr>
-    <div id="config-help">
-    Help placeholder
 
+    <div id="" class="row">
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+          <a class="nav-link active" id="v-pills-python-tab" data-toggle="pill" href="#v-pills-python" role="tab" aria-controls="v-pills-python" aria-selected="true">Python</a>
+          <a class="nav-link" id="v-pills-shell-tab" data-toggle="pill" href="#v-pills-shell" role="tab" aria-controls="v-pills-shell" aria-selected="false">Shell</a>
+        </div>
+        <div class="tab-content" id="v-pills-tabContent" style="padding-left: 50px">
+          <div class="tab-pane fade show active v-pills-python" id="v-pills-python" role="tabpanel" aria-labelledby="v-pills-python-tab">
+              <code>
+
+              </code>
+          </div>
+          <div class="tab-pane fade v-pills-shell" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-shell-tab"> </div>
+        </div>
     </div>
+
 
 {% endblock %}
 

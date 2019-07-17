@@ -10,8 +10,8 @@ from ipywidgets import Button, IntProgress, HBox
 
 from IPython import get_ipython
 
-
 from pyjano import is_notebook
+
 
 class ConsoleRunSink:
     def add_line(self, line):
@@ -30,6 +30,7 @@ class ConsoleRunSink:
     def is_displayed(self):
         return True
 
+
 from IPython.core.display import display
 from ipywidgets import widgets
 
@@ -41,17 +42,17 @@ class NotebookRunSink:
         self._is_displayed = True
         self._label = widgets.Label(value="Initializing...")
         self._stop_button = widgets.Button(
-                        description='Terminate',
-                        disabled=False,
-                        button_style='', # 'success', 'info', 'warning', 'danger' or ''
-                        tooltip='Terminate jana process',
-                        #icon='check'
-                    )
+            description='Terminate',
+            disabled=False,
+            button_style='',  # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='Terminate jana process',
+            # icon='check'
+        )
         self._command_label = widgets.HTML()
 
     # noinspection PyTypeChecker
     def display(self):
-        #title_widget = widgets.HTML('<em>Vertical Box Example</em>')
+        # title_widget = widgets.HTML('<em>Vertical Box Example</em>')
         self._stop_button.layout.display = ''
         control_box = widgets.HBox([self._stop_button, self._label])
 
@@ -61,7 +62,7 @@ class NotebookRunSink:
 
         vbox = widgets.VBox([control_box, accordion])
 
-        #display(accordion)
+        # display(accordion)
         display(vbox)
         self._is_displayed = True
 
@@ -78,7 +79,7 @@ class NotebookRunSink:
                 if test in token:
                     self._label.value = token
 
-        self._output_widget.append_stdout(line+'\n')
+        self._output_widget.append_stdout(line + '\n')
 
     def done(self):
         self._stop_button.layout.display = 'none'
@@ -133,6 +134,7 @@ def _run(command, sink):
 
     return retval, start_time, end_time, lines
 
+
 class Jana(object):
     static_content_is_inserted = False
 
@@ -183,7 +185,7 @@ class Jana(object):
 
         env_plugin_path = ':'.join(self.plugin_search_paths + ex_plugin_locations)
         os.environ['JANA_PLUGIN_PATH'] = env_plugin_path
-        #print(os.environ['JANA_PLUGIN_PATH'])
+        # print(os.environ['JANA_PLUGIN_PATH'])
         self._environ_is_updated = True
 
     def configure_plugin_paths(self, plugin_paths):
@@ -193,12 +195,11 @@ class Jana(object):
             try:
                 self.plugin_search_paths.remove(path)
             except ValueError:
-                pass   # no such path
+                pass  # no such path
 
             self.plugin_search_paths.insert(0, path)
 
         self._environ_is_updated = False
-
 
     def configure_plugins(self, plugins):
         self.config['plugins'] = {}
@@ -236,7 +237,7 @@ class Jana(object):
             if self.config['params']:
                 self.config['params'].update(params)
             else:
-                self.config['params']=params
+                self.config['params'] = params
         if flags:
             self.config['flags'] = flags
         if files:
@@ -245,10 +246,9 @@ class Jana(object):
         if plugin_paths:
             self.configure_plugin_paths(plugin_paths)
 
-
         # noinspection PyTypeChecker
         if self.is_notebook:
-            #display(Javascript('console.log("hello world")', lib='https://code.jquery.com/jquery-3.4.1.slim.js'))
+            # display(Javascript('console.log("hello world")', lib='https://code.jquery.com/jquery-3.4.1.slim.js'))
             clear_output()
             display(HTML('<b>JANA</b> configured...'))
 
@@ -265,9 +265,9 @@ class Jana(object):
         """))
 
     def plugins_gui(self):
-        #display(IFrame('http://localhost:8888/pyjano', width='100%', height=550))
-        #from pyjano.server import create_server
-        #server = create_server()
+        # display(IFrame('http://localhost:8888/pyjano', width='100%', height=550))
+        # from pyjano.server import create_server
+        # server = create_server()
 
         from pyjano.server.jana import offline_render
         display(widgets.HTML(offline_render()))
@@ -284,10 +284,9 @@ class Jana(object):
             }
                 """))
 
-
     def start_gui(self):
         display(IFrame('http://localhost:8888/pyjano/start', width='100%', height=170))
-        #self.sink.display()
+        # self.sink.display()
 
     def get_plugins_html(self):
         pass
@@ -296,7 +295,7 @@ class Jana(object):
         if not self._environ_is_updated:
             self.update_environment()
 
-        #if not self.sink.is_displayed:
+        # if not self.sink.is_displayed:
         self.sink.display()
         command = f"""{self.exec_path} {self.get_run_command()} -Pjana:debug_plugin_loading=1 """
         self.sink.show_running_command(command)
@@ -320,11 +319,16 @@ if __name__ == "__main__":
     jana = Jana()
     jana.configure(
         plugins=[  # a list of plugins to use:
-            'beagle_reader',    # plugin name, no additional parameters
-            {'open_charm': {    # add vmeson plugin & set '-Pvmeson:verbose=2' parameter
-                'verbose': 1,   # Set verbose mode for that plugin
+            'beagle_reader',  # plugin name, no additional parameters
+            {'open_charm': {  # add vmeson plugin & set '-Pvmeson:verbose=2' parameter
+                'verbose': 1,  # Set verbose mode for that plugin
                 'smearing': 1}  # Set smearing mode
             },
+            {'eic_smear': {
+                    'verbose': 1,
+                    'detector': 'jleic'
+                }
+            }
         ],
         files=["/home/romanov/ceic/data/herwig6_e-p_5x100.hepmc"],
         # or [list, of, files]
