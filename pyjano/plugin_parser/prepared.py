@@ -5,13 +5,10 @@ plugins = [
     {'name': 'lund_reader', 'type': 'reader'},
     {'name': 'beagle_reader', 'type': 'reader'},
     {'name': 'hepmc_reader', 'type': 'reader'},
-    {'name': 'jleic_geant_reader', 'type': 'reader'},
-    {'name': 'jleic_gemc_reader', 'type': 'reader'},
+    {'name': 'g4e_reader', 'type': 'reader'},
+    {'name': 'gemc_reader', 'type': 'reader'},
     {'name': 'jana', 'type': ''},
     {'name': 'eic_smear', 'type': ''},
-    {'name': 'trk_eff', 'type': ''},
-    {'name': 'jleic_iff', 'type': ''},
-    {'name': 'jleic_occupancy', 'type': ''},
     {'name': 'vmeson', 'type': ''},
     {'name': 'open_charm', 'type': ''},
 ]
@@ -38,9 +35,9 @@ def prepare_plugins():
 
     plugins_by_name['jana']['config'].extend(
         [
-            {'name': 'nevents', 'type': 'int', 'value': 0, 'help': Markup('Number of events to process. 0 = all')},
-            {'name': 'nskip', 'type': 'int', 'value': 0, 'help': Markup('Number of events to skip')},
-            {'name': 'nthreads', 'type': 'float', 'value': 5, 'help': Markup('Number of processing threads')},
+            {'name': 'nevents',  'type': 'int',   'value': 0,  'help': Markup('Number of events to process. 0 = all')},
+            {'name': 'nskip',    'type': 'int',   'value': 0,  'help': Markup('Number of events to skip')},
+            {'name': 'nthreads', 'type': 'float', 'value': 5,  'help': Markup('Number of processing threads')},
         ]
     )
 
@@ -56,10 +53,32 @@ def prepare_plugins():
 
     # === lund_reader ===
     plugins_by_name['lund_reader']['help'] = Markup("""
-       Opens files in LUND format.
-       <p>It is a text format. Its header defines quantities such as the number N of generated particle for each event and other kinematic properties.
-       <p><a href="https://gemc.jlab.org/gemc/html/documentation/generator/lund.html"> More info </a>
+       Opens files in LUND format. <br>
+       The format has many flavours,  
+       <a href="https://gemc.jlab.org/gemc/html/documentation/generator/lund.html"> original pythia6 </a> or 
+       <a href="https://wiki.bnl.gov/eic/index.php/PYTHIA">BNL pythia 6</a> are examples      
        """)
+
+    plugins_by_name['g4e_reader']['help'] = Markup("""
+           Opens files from Geant4EIC (G4E) root flattened format.
+           <a href="https://gitlab.com/jlab-eic/g4e/">G4E Official GitLab page </a>
+           """)
+
+    plugins_by_name['gemc_reader']['help'] = Markup("""
+               <strong>(!) deprecated </strong> and not guaranteed to work. 
+               <a href="https://gemc.jlab.org/gemc/html/index.html">GEMC page</a>
+               """)
+
+    # === EIC-smear ===
+    plugins_by_name['eic_smear']['help'] = Markup("""
+               Enables smearing based on EIC-Smear and JLEIC smear procedures<br>
+               parameter 'detector' must be set to enable smearing               
+               """)
+
+    plugins_by_name['eic_smear']['config'].append(
+        {'name': 'detector', 'type': 'string', 'value': 'jleic', 'help': Markup('Detector: beast, jleic, zeus, ephoenix ')}
+    )
+
 
     # === Open charm analysis ===
     plugins_by_name['open_charm']['help'] = Markup("""
@@ -75,11 +94,6 @@ def prepare_plugins():
         ]
     )
 
-    plugins_by_name['lund_reader']['config'].append(
 
-        {'name': 'smearing_source', 'type': 'int', 'value': 1,
-         'help': Markup('Smearing type: 0 - no, 1 - basic, 2 - eic-smear, 3 ')}
-
-    )
 
     return plugins

@@ -56,7 +56,8 @@ let plugins = [
 
     function renderPythonConfiguration(plugins) {
         let resulting_html = "";
-        for(let plugin of plugins) {
+
+        for(let [i, plugin] of plugins.entries()) {
 
             let args_str = `'${plugin.name}'`;   // a string with arguments for .plugin(...) function call
 
@@ -65,15 +66,18 @@ let plugins = [
                 for(let parameter of plugin.parameters) {
                     let escaped_value = '';
                     if(parameter.type === 'string') {
-                        escaped_value = `'${parameter.value}'`;
+                        escaped_value = `'${parameter.value}'`;     // Take string into quotes
                     }
                     else {
-                        escaped_value = `${parameter.value}`;
+                        escaped_value = `${parameter.value}`;       // Other parameters are out for now
                     }
-                    args_str += `, '${parameter.name}'=${escaped_value}`
+                    args_str += `, ${parameter.name}=${escaped_value}`
                 }
 
             let api_calls_str = `.plugin(${args_str})`;
+            if (i !== plugins.length - 1) {
+                api_calls_str += ' \\';
+            }
             resulting_html += `${api_calls_str}</br>`;
         }
         $('.v-pills-python code').html(resulting_html);

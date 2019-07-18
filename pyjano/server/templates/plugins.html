@@ -5,7 +5,7 @@
 {% endif -%}
 
 {% macro render_plugin_li(plugin) -%}
-    <li class="list-group-item info-source" data-name="{{ plugin['name'] }}" id="{{ plugin['name'] }}_li">
+    <li class="list-group-item info-source p-1 pt-2 pl-2" data-name="{{ plugin['name'] }}" id="{{ plugin['name'] }}_li">
         <div class="pretty p-switch">
             <input type="checkbox" class="plugin-checkbox" data-name="{{ plugin['name'] }}" data-type="plugin"/>
             <div class="state"><label></label></div>
@@ -17,10 +17,10 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <p class="card-text"><strong>IO plugins:</strong></p>
+        <div class="col m-0">
+            <div class="card mb-2 shadow-sm">
+                <div class="card-body p-1">
+                    <p class="card-text pl-3"><strong>IO plugins:</strong></p>
                     <!-- add class p-switch -->
                     <ul class="list-group list-group-flush" role="tablist">
                         {% for plugin in plugins if plugin['type']=='reader' %}
@@ -30,10 +30,10 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <p class="card-text"><strong>Process & Analysis:</strong></p>
+        <div class="col m-0">
+            <div class="card mb-2 shadow-sm">
+                <div class="card-body p-1">
+                    <p class="card-text pl-3"><strong>Process & Analysis:</strong></p>
                     <!-- add class p-switch -->
                     <ul class="list-group list-group-flush" role="tablist">
                         {% for plugin in plugins if plugin['type']!='reader' %}
@@ -43,18 +43,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
+        <div class="col m-0">
+            <div class="card mb-2 shadow-sm ">
                 {% for plugin in plugins %}
                     <ul class="plugin-config-set list-group list-group-flush" id="{{ plugin['name'] }}-config-set" style="display: none">
                         {% for pconfig in plugin['config'] %}
-                        <li class="plugin-config list-group-item config-info-source" data-name="{{ plugin['name'] }}---{{ pconfig['name'] }}" id="{{ pconfig['name'] }}_config">
+                        <li class="plugin-config list-group-item config-info-source p-1 pt-2 pl-2" data-name="{{ plugin['name'] }}---{{ pconfig['name'] }}" id="{{ pconfig['name'] }}_config">
                             <div class="row">
-                                <div class="input-group input-group-sm mb-3 col-sm-4">
+                                <div class="input-group input-group-sm mb-3 col-sm-6">
                                     <div class="input-group-prepend">
                                        <div class="input-group-text">
                                           <input type="checkbox" aria-label="Checkbox for following text input"
-                                                 class="plugin-param-checkbox"
+                                                 class="plugin-param-checkbox input-sm"
                                                  data-name="{{ plugin['name'] }}:{{ pconfig['name'] }}"
                                                  data-parname="{{ pconfig['name'] }}"
                                                  data-plugin="{{ plugin['name'] }}"
@@ -62,7 +62,7 @@
                                        </div>
                                     </div>
                                     <input type="text"
-                                           class="form-control plugin-param-input"
+                                           class="form-control plugin-param-input input-sm"
                                            value="{{ pconfig['value'] }}"
                                            data-name="{{ plugin['name'] }}:{{ pconfig['name'] }}"
                                            data-parname="{{ pconfig['name'] }}"
@@ -70,7 +70,7 @@
                                            data-plugintype="{{ pconfig['type'] }}"
                                            data-type="param">
                                 </div>
-                                <div class="col-sm-8">
+                                <div class="col-sm-6">
                                      {{ pconfig['name'] }} ({{ pconfig['type'] }})
                                 </div>
                             </div>

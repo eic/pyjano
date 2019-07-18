@@ -70,7 +70,8 @@ class NotebookRunSink:
         to_show = [
             'Initializing plugin',
             'Total events processed',
-            'events processed'
+            'events processed',
+            'ERROR'
         ]
 
         tokens = line.split('\n')
@@ -131,6 +132,8 @@ def _run(command, sink):
 
     sink.add_line("------------------------------------------")
     sink.add_line(f"RUN DONE. RETVAL: {retval} \n\n")
+    if retval != 0:
+        sink.add_line(f"ERROR. Retval is not 0. Plese, look at the logs\n")
 
     return retval, start_time, end_time, lines
 
@@ -201,8 +204,57 @@ class Jana(object):
 
         self._environ_is_updated = False
 
-    def configure_plugins(self, plugins):
+    def plugin(self, plugin_name, **plugin_args):
+        """
+        Adds (activates) a plugin with a given name.
+        This function may stack: .plugin('a').plugin('b')
+
+        Example: jana.plugin('eic_smear', verbose=2, detector='beast')
+                     .plugin('eventless_writer')
+
+        :param plugin_name: Name of the plugin to activate
+        :param plugin_args: Plugin arguments
+        :return:
+        """
+
+        self.config['plugins'][plugin_name] = plugin_args if plugin_args else {}
+        return self
+
+    def source(self, source_strings):
+        """Input source (usually files) configuration.
+
+        This function stacks with plugins and another source
+
+        ```python
+        jana.plugin('beagle_reader') \
+            .source('file1.txt')     \
+            .source(['file2.txt', 'file3.txt'])
+        ```
+        """
+
+        if isinstance(source_strings, str):
+            self.config['input_files'].append(source_strings)
+        else:
+            self.config['input_files'].extend(source_strings)
+
+        return self
+
+    def reset_plugins(self):
+        """
+        Resets the plugin configuration
+        """
+
         self.config['plugins'] = {}
+        return self
+
+    def configure_plugins(self, plugins):
+        """ Configures plugins (using dicts). Replaces the previous configuration.
+
+        :param plugins:
+        :return: dict with plugins config
+        """
+        self.reset_plugins()
+
         if not plugins:
             return self.config['plugins']
 
@@ -265,9 +317,8 @@ class Jana(object):
         """))
 
     def plugins_gui(self):
-        # display(IFrame('http://localhost:8888/pyjano', width='100%', height=550))
-        # from pyjano.server import create_server
-        # server = create_server()
+
+        self.interactive_notebook()
 
         from pyjano.server.jana import offline_render
         display(widgets.HTML(offline_render()))
@@ -283,10 +334,6 @@ class Jana(object):
                  activatePluginsGui();
             }
                 """))
-
-    def start_gui(self):
-        display(IFrame('http://localhost:8888/pyjano/start', width='100%', height=170))
-        # self.sink.display()
 
     def get_plugins_html(self):
         pass
@@ -313,6 +360,15 @@ class Jana(object):
         files_str = " ".join([file for file in self.config['input_files']])
         flags_str = " ".join([flag for flag in self.config['flags']])
         return f'{add_plugins_str} {plugins_params_str} {params_str}  {files_str} {flags_str}'
+
+    def _repr_html_(self):
+        plugins_str = ",".join(self.config['plugins'].keys())
+
+        result_str = f"<strong>eJana</strong> configured<br><strong>plugins:</strong> {plugins_str}"
+        if self.config['input_files']:
+            sources_str = "<br>".join(self.config['input_files'])
+            result_str += f"<br><strong>sources:</strong><br>{sources_str}"
+        return result_str
 
 
 if __name__ == "__main__":
