@@ -1,3 +1,8 @@
+"""Pyjano stands for Python Jana Orchestrator
+
+The packet contains tools and python wrappers that allows to run JANA2 and eic-JANA frameworks
+processes from python. The python also provides IPython widgets and interactive controls
+"""
 import itertools
 import os
 from time import sleep

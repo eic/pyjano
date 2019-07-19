@@ -9,6 +9,7 @@ plugins = [
     {'name': 'gemc_reader', 'type': 'reader'},
     {'name': 'jana', 'type': ''},
     {'name': 'eic_smear', 'type': ''},
+    {'name': 'event_writer', 'type': ''},
     {'name': 'vmeson', 'type': ''},
     {'name': 'open_charm', 'type': ''},
 ]
@@ -37,7 +38,8 @@ def prepare_plugins():
         [
             {'name': 'nevents',  'type': 'int',   'value': 0,  'help': Markup('Number of events to process. 0 = all')},
             {'name': 'nskip',    'type': 'int',   'value': 0,  'help': Markup('Number of events to skip')},
-            {'name': 'nthreads', 'type': 'float', 'value': 5,  'help': Markup('Number of processing threads')},
+            # {'name': 'nthreads', 'type': 'int',    'value': 1,  'help': Markup('Number of processing threads')},
+            {'name': 'output',   'type': 'string', 'value': 'out.root', 'help': Markup('Output file name')},
         ]
     )
 
@@ -79,6 +81,10 @@ def prepare_plugins():
         {'name': 'detector', 'type': 'string', 'value': 'jleic', 'help': Markup('Detector: beast, jleic, zeus, ephoenix ')}
     )
 
+    # === Event writer ===
+    plugins_by_name['event_writer']['help'] = Markup("""
+                   Create TTree with flattened Event data. (Create branches according to data available)
+                   """)
 
     # === Open charm analysis ===
     plugins_by_name['open_charm']['help'] = Markup("""
@@ -87,13 +93,16 @@ def prepare_plugins():
 
     plugins_by_name['open_charm']['config'].extend(
         [
-            {'name': 'smearing_source', 'type': 'int', 'value': 1,
-             'help': Markup('Smearing type: 0 - no, 1 - basic, 2 - eic-smear, 3 ')},
-            {'name': 'eEnergy', 'type': 'float', 'value': 5, 'help': Markup('electron beam energy GeV')},
-            {'name': 'iEnergy', 'type': 'float', 'value': 50, 'help': Markup('ion beam energy GeV ')},
+            {'name': 'e_beam_energy', 'type': 'float', 'value': 5, 'help': Markup('electron beam energy GeV')},
+            {'name': 'ion_beam_energy', 'type': 'float', 'value': 100, 'help': Markup('ion beam energy GeV ')},
         ]
     )
 
-
+    plugins_by_name['vmeson']['config'].extend(
+        [
+            {'name': 'e_beam_energy', 'type': 'float', 'value': 5, 'help': Markup('electron beam energy GeV')},
+            {'name': 'ion_beam_energy', 'type': 'float', 'value': 100, 'help': Markup('ion beam energy GeV ')},
+        ]
+    )
 
     return plugins

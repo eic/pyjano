@@ -1,3 +1,6 @@
+"""Pyjano stands for Python Jana Orchestrator
+
+"""
 import os
 import shlex
 import subprocess
@@ -139,6 +142,10 @@ def _run(command, sink):
 
 
 class Jana(object):
+    """Jana - class allows to configure and run ejana (and genue JANA) processes.
+    It also provides IPython widgets for interactive control over jana from Jupyter
+    """
+
     static_content_is_inserted = False
 
     server = None
@@ -168,6 +175,7 @@ class Jana(object):
         self._environ_is_updated = False
 
     def update_environment(self):
+        """Updates the environment according to the configuration"""
         def print_plugin_locations(locations):
             for loc in locations:
                 self.sink.add_line(f"   {loc}")
@@ -189,6 +197,7 @@ class Jana(object):
         self._environ_is_updated = True
 
     def configure_plugin_paths(self, plugin_paths):
+        """Set additional paths where JANA looks for plugins"""
         # The later plugin location will have greater load priority
         # This means that it must be earlier in the list
         for path in plugin_paths:
@@ -283,6 +292,37 @@ class Jana(object):
         return self.config['plugins']
 
     def configure(self, plugins=None, flags=None, files=None, params=None, plugin_paths=None):
+        """Universal configuration function
+
+        (!) this function resets and overwrites the configuration made by functions like plugin, input, etc
+
+        Example:
+
+        jana.configure(
+        plugins=[  # a list of plugins to use:
+            'beagle_reader',  # plugin name, no additional parameters
+            {'open_charm': {  # add vmeson plugin & set '-Pvmeson:verbose=2' parameter
+                'verbose': 1,  # Set verbose mode for that plugin
+                'smearing': 1}  # Set smearing mode
+            },
+            {'eic_smear': {
+                    'verbose': 1,
+                    'detector': 'jleic'
+                }
+            }
+        ],
+        files=["/home/romanov/ceic/data/herwig6_e-p_5x100.hepmc"],  # or [list, of, files]
+        params={'nthreads': 4, 'nevents': 2000}  # for parameters that don't follow <plugin>:<name> naming
+                                                 # Smart enough to run it like --nthreads=8
+    )  # instead of -P...
+
+
+        :param plugins: list of plugins
+        :param flags: list of raw flags (will be added to launch arguments without formatting)
+        :param files: list of input files
+        :param params: list of parameters (will be added with -P<name>=<value> flag)
+        :param plugin_paths: Additional paths to search for plugins
+        """
         if plugins:
             self.configure_plugins(plugins)
         if params:
@@ -305,6 +345,10 @@ class Jana(object):
             display(HTML('<b>JANA</b> configured...'))
 
     def interactive_notebook(self):
+        """Installs scripts and styles for page that enables interactive widgets
+
+          Obsoletes within Jupyter lab ^1.0.2
+         """
 
         '/static/css/bootstrap.min.css'
 
@@ -317,6 +361,7 @@ class Jana(object):
         """))
 
     def plugins_gui(self):
+        """Shows interactive GUI, which helps configure plugins and their parameters"""
 
         self.interactive_notebook()
 
@@ -335,10 +380,9 @@ class Jana(object):
             }
                 """))
 
-    def get_plugins_html(self):
-        pass
 
     def run(self):
+        """Runs ejana/JANA process """
         if not self._environ_is_updated:
             self.update_environment()
 
@@ -349,13 +393,16 @@ class Jana(object):
         _run(command, self.sink)
 
     def get_run_command(self):
+        """Returns the command, which is used to execute jejana"""
         add_plugins_str = "-Pplugins=" + ",".join(self.config['plugins'].keys())
-        plugins_params_str = ""
+        plugins_params_str = " -Pnthreads=1"
         for plugin_name, plugin_params in self.config['plugins'].items():
             if plugin_params:
                 for name, value in plugin_params.items():
                     # We have some "magic" jana flags like nskip and nthreads
-                    if plugin_name == 'jana' and name in ['nevents', 'nskip', 'nthreads']:
+                    if plugin_name == 'jana' and name in ['nevents', 'nskip', 'nthreads', 'output']:
+                        if name == 'nthreads':
+                            continue
                         plugins_params_str += f' -P{name}={value}'
                     else:
                         plugins_params_str += f' -P{plugin_name}:{name}={value}'
