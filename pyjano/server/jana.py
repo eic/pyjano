@@ -15,8 +15,6 @@ jana_blueprint = Blueprint('main', __name__)
 def index():
     """Login form to enter a room."""
 
-
-
     return render_template('plugins.html', layout="short", plugins=prepare_plugins())
 
 
@@ -38,15 +36,19 @@ def offline_render():
 def full():
     """Login form to enter a room."""
 
-
-    return render_template('plugins.html', layout="full", plugins=prepare_plugins())
+    return render_template('plugins.html', layout="full", plugins=prepare_plugins(), plugin_data="""
+    {'params': {'nevents': 10000, 'nthreads': 1},
+     'plugins': {'beagle_reader': {}, 'event_writer': {}},
+     'flags': [],
+     'input_files': []}""")
 
 
 @jana_blueprint.route('/start', methods=['GET', 'POST'])
 def start_gui():
     """Login form to enter a room."""
 
-    return render_template('start.html', layout="full", plugins=prepare_plugins())
+    return render_template('start.html', layout="full", plugins=prepare_plugins(), plugin_data="")
+
 
 @jana_blueprint.route('/chat')
 def chat():

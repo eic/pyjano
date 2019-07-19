@@ -159,10 +159,7 @@ class Jana(object):
         self.runner = None
 
         self.exec_path = 'ejana'
-        self.plugin_search_paths = [
-            '/home/romanov/eic/ejana/dev/compiled/plugins',
-            '/home/romanov/eic/jana/jana-greenfield/plugins'
-        ]
+        self.plugin_search_paths = []
         self.config['params'] = {}
         self.config['plugins'] = {}
         self.config['flags'] = []
@@ -217,7 +214,10 @@ class Jana(object):
         :return:
         """
 
-        self.config['plugins'][plugin_name] = plugin_args if plugin_args else {}
+        if plugin_name == 'jana' and plugin_args:
+            self.config['params'].update(plugin_args)
+        else:
+            self.config['plugins'][plugin_name] = plugin_args if plugin_args else {}
         return self
 
     def source(self, source_strings):
@@ -354,7 +354,11 @@ class Jana(object):
         for plugin_name, plugin_params in self.config['plugins'].items():
             if plugin_params:
                 for name, value in plugin_params.items():
-                    plugins_params_str += f' -P{plugin_name}:{name}={value}'
+                    # We have some "magic" jana flags like nskip and nthreads
+                    if plugin_name == 'jana' and name in ['nevents', 'nskip', 'nthreads']:
+                        plugins_params_str += f' -P{name}={value}'
+                    else:
+                        plugins_params_str += f' -P{plugin_name}:{name}={value}'
 
         params_str = " ".join([f'-P{name}={value}' for name, value in self.config['params'].items()])
         files_str = " ".join([file for file in self.config['input_files']])
