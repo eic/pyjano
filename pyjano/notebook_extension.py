@@ -29,6 +29,10 @@ class CorsStaticFileHandler(tornado.web.StaticFileHandler):
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
         self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
 
+    def get_content_type(self):
+        # This is required for for jsroot to use partial file loading 
+        return 'text/plain'
+
 def load_jupyter_server_extension(nb_app):
     '''
     Register a hello world handler.
