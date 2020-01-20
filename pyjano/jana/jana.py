@@ -72,9 +72,10 @@ class NotebookRunSink:
     def add_line(self, line):
         to_show = [
             'Initializing plugin',
-            'Total events processed',
-            'events processed',
-            'ERROR'
+            'Start processing',
+            'Completed events',
+            'ERROR',
+            'FATAL',
         ]
 
         tokens = line.split('\n')
@@ -108,6 +109,7 @@ def _run(command, sink):
     # Pretty header for the command
     sink.add_line('=' * 20)
     sink.add_line("RUN: " + " ".join(command))
+    sink.add_line('=' * 20)
 
     # Record the start time
     start_time = datetime.now()
