@@ -76,6 +76,7 @@ class NotebookRunSink:
             'Completed events',
             'ERROR',
             'FATAL',
+            '[INFO]'
         ]
 
         tokens = line.split('\n')
