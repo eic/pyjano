@@ -1,4 +1,4 @@
 exclude .gitignore
 
 include pip_readme.md
-recursive-include janapy/ *.py
+recursive-include pyjano/ *.py

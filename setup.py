@@ -1,7 +1,7 @@
 import os
 import inspect
 from setuptools import setup
-from ejpm.version import version as ejpm_version
+from pyjano.version import version as pyjano_version
 
 # The directory containing this file
 this_script_dir = os.path.dirname(inspect.stack()[0][1])
@@ -12,8 +12,8 @@ with open(os.path.join(this_script_dir, "pip_readme.md"), 'r') as readme_file:
 
 # This call to setup() does all the work
 setup(
-    name="janapy",
-    version=ejpm_version,
+    name="pyjano",
+    version=pyjano_version,
     description="JANA2 api and control through python",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -34,7 +34,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
     ],
-    packages=["janapy"],
+    packages=["pyjano"],
     include_package_data=True,
 #    setup_requires=["click", "appdirs"],
 #    install_requires=["click", "appdirs"],
