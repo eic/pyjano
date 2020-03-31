@@ -29,15 +29,18 @@ pip install --upgrade --force-reinstall setuptools
 python setup.py sdist bdist_wheel
 
 python -m twine upload dist/*
-
-python -m twine upload --cert ~/JLabCA.cer dist/*
-
 ```
 
-JLAB CERTIFICATE ERROR:
+PACK AND UPLOAD
 
 ```bash
-python -m twine upload --cert /home/romanov/JLabCA.crt dist/*
+python setup.py sdist bdist_wheel && python -m twine upload dist/*
+```
+
+Jefferson Lab certificates
+```bash
+python -m twine upload --cert ~/JLabCA.cer dist/*
+
 ```
 
 

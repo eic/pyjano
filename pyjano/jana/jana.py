@@ -2,146 +2,146 @@
 
 """
 import os
-import shlex
-import subprocess
-import sys
-from datetime import datetime
 
-from IPython.display import IFrame
 from IPython.display import display, Javascript, clear_output, HTML
-from ipywidgets import Button, IntProgress, HBox
+from ipywidgets import Button, IntProgress, HBox, widgets
 
 from IPython import get_ipython
 
-from pyjano import is_notebook
+import escrun
+from escrun.console_run_sink import ConsoleRunSink
+from escrun.notebook_run_sink import NotebookRunSink
 
 
-class ConsoleRunSink:
-    def add_line(self, line):
-        print(line)
-
-    def display(self):
-        print("Rendering in console")
-
-    def done(self):
-        pass
-
-    def show_running_command(self, command):
-        print(f'Command = "{command}"')
-
-    @property
-    def is_displayed(self):
-        return True
-
-
-from IPython.core.display import display
-from ipywidgets import widgets
-
-
-class NotebookRunSink:
-
-    def __init__(self):
-        self._output_widget = widgets.Output()
-        self._is_displayed = True
-        self._label = widgets.Label(value="Initializing...")
-        self._stop_button = widgets.Button(
-            description='Terminate',
-            disabled=False,
-            button_style='',  # 'success', 'info', 'warning', 'danger' or ''
-            tooltip='Terminate jana process',
-            # icon='check'
-        )
-        self._command_label = widgets.HTML()
-
-    # noinspection PyTypeChecker
-    def display(self):
-        # title_widget = widgets.HTML('<em>Vertical Box Example</em>')
-        self._stop_button.layout.display = ''
-        control_box = widgets.HBox([self._stop_button, self._label])
-
-        accordion = widgets.Accordion(children=[self._output_widget, self._command_label], selected_index=None)
-        accordion.set_title(0, 'Full log')
-        accordion.set_title(1, 'Run command')
-
-        vbox = widgets.VBox([control_box, accordion])
-
-        # display(accordion)
-        display(vbox)
-        self._is_displayed = True
-
-    def add_line(self, line):
-        to_show = [
-            'Initializing plugin',
-            'Start processing',
-            'Completed events',
-            'ERROR',
-            'FATAL',
-            '[INFO]'
-        ]
-
-        tokens = line.split('\n')
-        for token in tokens:
-            for test in to_show:
-                if test in token:
-                    self._label.value = token
-
-        self._output_widget.append_stdout(line + '\n')
-
-    def done(self):
-        self._stop_button.layout.display = 'none'
-
-    def show_running_command(self, command):
-        tokens = shlex.split(command)
-        self._command_label.value = '<br>'.join(tokens)
-
-    @property
-    def is_displayed(self):
-        return self._is_displayed
-
-
-def _run(command, sink):
-    """Wrapper around subprocess.Popen that returns:
-
-    :return retval, start_time, end_time, lines
-    """
-    if isinstance(command, str):
-        command = shlex.split(command)
-
-    # Pretty header for the command
-    sink.add_line('=' * 20)
-    sink.add_line("RUN: " + " ".join(command))
-    sink.add_line('=' * 20)
-
-    # Record the start time
-    start_time = datetime.now()
-    lines = []
-
-    # stderr is redirected to STDOUT because otherwise it needs special handling
-    # we don't need it and we don't care as C++ warnings generate too much stderr
-    # which makes it pretty much like stdout
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    while True:
-        line = process.stdout.readline().decode('latin-1').replace('\r', '\n')
-
-        if process.poll() is not None and line == '':
-            break
-        if line:
-            if line.endswith('\n'):
-                line = line[:-1]
-            sink.add_line(line)
-            lines.append(line)
-
-    # Get return value and finishing time
-    retval = process.poll()
-    end_time = datetime.now()
-    sink.done()
-
-    sink.add_line("------------------------------------------")
-    sink.add_line(f"RUN DONE. RETVAL: {retval} \n\n")
-    if retval != 0:
-        sink.add_line(f"ERROR. Retval is not 0. Plese, look at the logs\n")
-
-    return retval, start_time, end_time, lines
+#
+# class ConsoleRunSink:
+#     def add_line(self, line):
+#         print(line)
+#
+#     def display(self):
+#         print("Rendering in console")
+#
+#     def done(self):
+#         pass
+#
+#     def show_running_command(self, command):
+#         print(f'Command = "{command}"')
+#
+#     @property
+#     def is_displayed(self):
+#         return True
+#
+#
+# from IPython.core.display import display
+# from ipywidgets import widgets
+#
+#
+# class NotebookRunSink:
+#
+#     def __init__(self):
+#         self._output_widget = widgets.Output()
+#         self._is_displayed = True
+#         self._label = widgets.Label(value="Initializing...")
+#         self._stop_button = widgets.Button(
+#             description='Terminate',
+#             disabled=False,
+#             button_style='',  # 'success', 'info', 'warning', 'danger' or ''
+#             tooltip='Terminate jana process',
+#             # icon='check'
+#         )
+#         self._command_label = widgets.HTML()
+#
+#     # noinspection PyTypeChecker
+#     def display(self):
+#         # title_widget = widgets.HTML('<em>Vertical Box Example</em>')
+#         self._stop_button.layout.display = ''
+#         control_box = widgets.HBox([self._stop_button, self._label])
+#
+#         accordion = widgets.Accordion(children=[self._output_widget, self._command_label], selected_index=None)
+#         accordion.set_title(0, 'Full log')
+#         accordion.set_title(1, 'Run command')
+#
+#         vbox = widgets.VBox([control_box, accordion])
+#
+#         # display(accordion)
+#         display(vbox)
+#         self._is_displayed = True
+#
+#     def add_line(self, line):
+#         to_show = [
+#             'Initializing plugin',
+#             'Start processing',
+#             'Completed events',
+#             'ERROR',
+#             'FATAL',
+#             '[INFO]'
+#         ]
+#
+#         tokens = line.split('\n')
+#         for token in tokens:
+#             for test in to_show:
+#                 if test in token:
+#                     self._label.value = token
+#
+#         self._output_widget.append_stdout(line + '\n')
+#
+#     def done(self):
+#         self._stop_button.layout.display = 'none'
+#
+#     def show_running_command(self, command):
+#         tokens = shlex.split(command)
+#         self._command_label.value = '<br>'.join(tokens)
+#
+#     @property
+#     def is_displayed(self):
+#         return self._is_displayed
+#
+#
+# def _run(command, sink):
+#     """Wrapper around subprocess.Popen that returns:
+#
+#     :return retval, start_time, end_time, lines
+#     """
+#     if isinstance(command, str):
+#         command = shlex.split(command)
+#
+#     # Pretty header for the command
+#     sink.add_line('=' * 20)
+#     sink.add_line("RUN: " + " ".join(command))
+#     sink.add_line('=' * 20)
+#
+#     # Record the start time
+#     start_time = datetime.now()
+#     lines = []
+#
+#     # stderr is redirected to STDOUT because otherwise it needs special handling
+#     # we don't need it and we don't care as C++ warnings generate too much stderr
+#     # which makes it pretty much like stdout
+#     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+#     while True:
+#         line = process.stdout.readline().decode('latin-1').replace('\r', '\n')
+#
+#         if process.poll() is not None and line == '':
+#             break
+#         if line:
+#             if line.endswith('\n'):
+#                 line = line[:-1]
+#             sink.add_line(line)
+#             lines.append(line)
+#
+#     # Get return value and finishing time
+#     retval = process.poll()
+#     end_time = datetime.now()
+#     sink.done()
+#
+#     sink.add_line("------------------------------------------")
+#     sink.add_line(f"RUN DONE. RETVAL: {retval} \n\n")
+#     if retval != 0:
+#         sink.add_line(f"ERROR. Retval is not 0. Plese, look at the logs\n")
+#
+#     return retval, start_time, end_time, lines
+from escrun.runner import run
+from escrun.test_env import is_notebook
 
 
 class Jana(object):
@@ -166,6 +166,7 @@ class Jana(object):
             else:
                 self.sink = ConsoleRunSink()
 
+        self.sink.to_show = ["%]", "Error", "ERROR", "FATAL"]  # "[" - Cmake like "[9%]"
         self.runner = None
 
         self.exec_path = 'ejana'
@@ -345,8 +346,10 @@ class Jana(object):
         if self.is_notebook:
             # display(Javascript('console.log("hello world")', lib='https://code.jquery.com/jquery-3.4.1.slim.js'))
             clear_output()
+            # noinspection PyTypeChecker
             display(HTML('<b>JANA</b> configured...'))
 
+    # noinspection PyTypeChecker
     def interactive_notebook(self):
         """Installs scripts and styles for page that enables interactive widgets
 
@@ -363,6 +366,7 @@ class Jana(object):
         '<b>Pyjano</b> jupyter notebook interactive loaded...'        
         """))
 
+    # noinspection PyTypeChecker
     def plugins_gui(self):
         """Shows interactive GUI, which helps configure plugins and their parameters"""
 
@@ -384,7 +388,7 @@ class Jana(object):
                 """))
 
 
-    def run(self):
+    def run(self, retval_raise=False):
         """Runs ejana/JANA process """
         if not self._environ_is_updated:
             self.update_environment()
@@ -393,7 +397,7 @@ class Jana(object):
         self.sink.display()
         command = f"""{self.exec_path} {self.get_run_command()} -Pjana:debug_plugin_loading=1 """
         self.sink.show_running_command(command)
-        _run(command, self.sink)
+        run(command, self.sink, retval_raise=retval_raise)
 
     def get_run_command(self):
         """Returns the command, which is used to execute jejana"""

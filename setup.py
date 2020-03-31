@@ -34,7 +34,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
     ],
-    packages=["pyjano"],
+    packages=["pyjano", "escrun"],
     include_package_data=True,
 #    setup_requires=["click", "appdirs"],
 #    install_requires=["click", "appdirs"],
