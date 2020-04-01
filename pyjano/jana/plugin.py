@@ -52,6 +52,7 @@ class PluginFromSource(Plugin):
     def __init__(self, plugin_path, **kwargs):
         self.builder = PluginCmakeBuildManager(plugin_path, **kwargs)
         self.builder.config['build_target'] = 'install'
+        self.builder.config['cxx_standard'] = '17'
         self.args = {}
         super().__init__(self.builder.config['name'])
 

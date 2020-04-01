@@ -143,7 +143,7 @@ from escrun.notebook_run_sink import NotebookRunSink
 #     return retval, start_time, end_time, lines
 from escrun.runner import run
 from escrun.test_env import is_notebook
-from pyjano.jana.user_plugin import PluginFromSource, Plugin
+from .plugin import PluginFromSource, Plugin
 
 
 class Jana(object):

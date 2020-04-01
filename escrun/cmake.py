@@ -75,21 +75,23 @@ class CmakeBuildManager(object):
                   f"You may create it (if you sure it is right) with the command:\n"\
                   f"  mkdir -p {os.path.abspath(self.config['build_prefix'])}"
         raise ValueError(err_msg)
-        
 
-    def cmake_configure(self, build_type='RelWithDebInfo', silence_warnings=True):
+    def cmake_configure(self, build_type='RelWithDebInfo', silence_warnings=True, flags=""):
         """
-        RelwithDebInfo
+        Runs cmake configuration
+
+        :param flags: CMake configuration flags like '-DCMAKE...'
         :param build_type:
         :param silence_warnings:
         :return:
         """
         self.ensure_build_dir_exist()
 
-        flags = ""
+        if self.config.get('cxx_standard', ''):
+            flags += ' -DCMAKE_CXX_STANDARD={}'.format(self.config['cxx_standard'])
 
-        if self.config['install_prefix']:
-            flags +=  '-DCMAKE_INSTALL_PREFIX=' + self.config['install_prefix']
+        if self.config.get('install_prefix', ''):
+            flags +=  ' -DCMAKE_INSTALL_PREFIX=' + self.config['install_prefix']
 
         command = f"cmake {flags} -DCMAKE_BUILD_TYPE={build_type} {os.path.abspath(self.config['plugin_path'])}"
         self.sink.to_show = [">>>", "-- Configuring done", "-- Generating done", "Error"]  # "[" - Cmake like "[9%]"
