@@ -1,5 +1,6 @@
 """Pyjano stands for Python Jana Orchestrator
 
+Jana(nthreads=10, )
 """
 import os
 
@@ -142,6 +143,7 @@ from escrun.notebook_run_sink import NotebookRunSink
 #     return retval, start_time, end_time, lines
 from escrun.runner import run
 from escrun.test_env import is_notebook
+from pyjano.jana.user_plugin import PluginFromSource, Plugin
 
 
 class Jana(object):
@@ -153,7 +155,7 @@ class Jana(object):
 
     server = None
 
-    def __init__(self, gui='auto'):
+    def __init__(self, gui='auto', **kwargs):
         self.config = {}
 
         if not gui:
@@ -172,6 +174,8 @@ class Jana(object):
         self.exec_path = 'ejana'
         self.plugin_search_paths = []
         self.config['params'] = {}
+        self.config['params'].update(kwargs)
+
         self.config['plugins'] = {}
         self.config['flags'] = []
         self.config['input_files'] = []
@@ -214,7 +218,9 @@ class Jana(object):
 
         self._environ_is_updated = False
 
-    def plugin(self, plugin_name, **plugin_args):
+
+
+    def plugin(self, plugin, **plugin_args):
         """
         Adds (activates) a plugin with a given name.
         This function may stack: .plugin('a').plugin('b')
@@ -222,15 +228,37 @@ class Jana(object):
         Example: jana.plugin('eic_smear', verbose=2, detector='beast')
                      .plugin('eventless_writer')
 
-        :param plugin_name: Name of the plugin to activate
+        :param plugin: Name of the plugin to activate
         :param plugin_args: Plugin arguments
         :return:
         """
 
-        if plugin_name == 'jana' and plugin_args:
+        if plugin == 'jana' and plugin_args:
             self.config['params'].update(plugin_args)
-        else:
-            self.config['plugins'][plugin_name] = plugin_args if plugin_args else {}
+            return self
+
+        # It just a plugin name like:
+        # .plugin('vmeson', ...)
+        if isinstance(plugin, str):
+            self.config['plugins'][plugin] = Plugin(plugin, **plugin_args)
+            return self
+
+        # Making sure that plugin is from Plugin
+        assert isinstance(plugin, Plugin)
+
+        # Update args
+        self.config['plugins'][plugin.name] = plugin
+        plugin.args.update(plugin_args)
+
+        # Do we need to append search path?
+        if plugin.search_path and plugin.search_path not in self.plugin_search_paths:
+            self.plugin_search_paths.append(plugin.search_path)
+            self._environ_is_updated = False    # this will trigger regenerating env
+
+        # replace sink if needed
+        if isinstance(plugin, PluginFromSource):
+            plugin.builder.sink = self.sink
+
         return self
 
     def source(self, source_strings):
@@ -387,7 +415,6 @@ class Jana(object):
             }
                 """))
 
-
     def run(self, retval_raise=False):
         """Runs ejana/JANA process """
         if not self._environ_is_updated:
@@ -395,24 +422,26 @@ class Jana(object):
 
         # if not self.sink.is_displayed:
         self.sink.display()
+
+        # Build plugins?
+        for plugin in self.config['plugins'].values():
+            if isinstance(plugin, PluginFromSource):
+                plugin.builder.cmake_configure()
+                plugin.builder.build()
+
         command = f"""{self.exec_path} {self.get_run_command()} -Pjana:debug_plugin_loading=1 """
         self.sink.show_running_command(command)
+
+        # RuN
         run(command, self.sink, retval_raise=retval_raise)
 
     def get_run_command(self):
         """Returns the command, which is used to execute jejana"""
         add_plugins_str = "-Pplugins=" + ",".join(self.config['plugins'].keys())
         plugins_params_str = " -Pnthreads=1"
-        for plugin_name, plugin_params in self.config['plugins'].items():
-            if plugin_params:
-                for name, value in plugin_params.items():
-                    # We have some "magic" jana flags like nskip and nthreads
-                    if plugin_name == 'jana' and name in ['nevents', 'nskip', 'nthreads', 'output']:
-                        if name == 'nthreads':
-                            continue
-                        plugins_params_str += f' -P{name}={value}'
-                    else:
-                        plugins_params_str += f' -P{plugin_name}:{name}={value}'
+        for plugin in self.config['plugins'].values():
+            for name, value in plugin.args.items():
+                plugins_params_str += f' -P{plugin.name}:{name}={value}'
 
         params_str = " ".join([f'-P{name}={value}' for name, value in self.config['params'].items()])
         files_str = " ".join([file for file in self.config['input_files']])
