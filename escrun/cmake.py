@@ -91,7 +91,7 @@ class CmakeBuildManager(object):
             flags += ' -DCMAKE_CXX_STANDARD={}'.format(self.config['cxx_standard'])
 
         if self.config.get('install_prefix', ''):
-            flags +=  ' -DCMAKE_INSTALL_PREFIX=' + self.config['install_prefix']
+            flags +=  ' -DCMAKE_INSTALL_PREFIX=' + os.path.abspath(self.config['install_prefix'])
 
         command = f"cmake {flags} -DCMAKE_BUILD_TYPE={build_type} {os.path.abspath(self.config['plugin_path'])}"
         self.sink.to_show = [">>>", "-- Configuring done", "-- Generating done", "Error"]  # "[" - Cmake like "[9%]"

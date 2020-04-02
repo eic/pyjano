@@ -4,6 +4,7 @@ from datetime import datetime
 
 import sys
 import asyncio
+import os
 
 if sys.platform == "win32":
     # noinspection PyUnresolvedReferences
@@ -104,6 +105,7 @@ def run(command, sink, cwd=None, shell=False, retval_raise=False):
 
     # Pretty header for the command
     sink.add_line('=' * 20)
+    sink.add_line("CWD: " + cwd if cwd else os.getcwd())
     sink.add_line("RUN: " + " ".join(command))
     sink.add_line('=' * 20)
 
