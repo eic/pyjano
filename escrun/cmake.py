@@ -34,7 +34,7 @@ class CmakeBuildManager(object):
         # Automatically create build dir?
         self.config['auto_create_build_dir'] = self.config.get('auto_create_build_dir', False)
 
-    def run_cmake_target(self, target, suffix=''):
+    def run_cmake_target(self, target, suffix='', retval_raise=False):
         """Builds G4E"""
         # Generate execution file        
 
@@ -44,9 +44,12 @@ class CmakeBuildManager(object):
         self.sink.show_running_command(command)
         # if not self.sink.is_displayed:
         self.sink.display()
-        run(command, self.sink, cwd=self.config['build_prefix'])
 
-    def build(self, threads='auto'):
+        retval, _,_,_ = run(command, self.sink, cwd=self.config['build_prefix'], retval_raise=retval_raise)
+        return retval == 0
+
+
+    def build(self, threads='auto', retval_raise=False):
         self.ensure_build_dir_exist()
         if threads == 'auto':
             import multiprocessing
@@ -56,10 +59,10 @@ class CmakeBuildManager(object):
                 
         suffix = f' -- -j {threads} -w '
 
-        self.run_cmake_target(self.config['build_target'], suffix)
+        self.run_cmake_target(self.config['build_target'], suffix, retval_raise=retval_raise)
 
-    def clean(self):
-        self.run_cmake_target('clean')
+    def clean(self, retval_raise=False):
+        self.run_cmake_target('clean', retval_raise=retval_raise)
 
     def ensure_build_dir_exist(self):
         if os.path.exists(self.config['build_prefix']):
@@ -76,7 +79,7 @@ class CmakeBuildManager(object):
                   f"  mkdir -p {os.path.abspath(self.config['build_prefix'])}"
         raise ValueError(err_msg)
 
-    def cmake_configure(self, build_type='RelWithDebInfo', silence_warnings=True, flags=""):
+    def cmake_configure(self, build_type='RelWithDebInfo', silence_warnings=True, flags="", retval_raise=False):
         """
         Runs cmake configuration
 
@@ -91,7 +94,7 @@ class CmakeBuildManager(object):
             flags += ' -DCMAKE_CXX_STANDARD={}'.format(self.config['cxx_standard'])
 
         if self.config.get('install_prefix', ''):
-            flags +=  ' -DCMAKE_INSTALL_PREFIX=' + os.path.abspath(self.config['install_prefix'])
+            flags += ' -DCMAKE_INSTALL_PREFIX=' + os.path.abspath(self.config['install_prefix'])
 
         command = f"cmake {flags} -DCMAKE_BUILD_TYPE={build_type} {os.path.abspath(self.config['plugin_path'])}"
         self.sink.to_show = [">>>", "-- Configuring done", "-- Generating done", "Error"]  # "[" - Cmake like "[9%]"
@@ -99,7 +102,7 @@ class CmakeBuildManager(object):
 
         # if not self.sink.is_displayed:
         self.sink.display()
-        run(command, self.sink, cwd=self.config['build_prefix'])
+        run(command, self.sink, cwd=self.config['build_prefix'], retval_raise=retval_raise)
 
 
     def _repr_html_(self):

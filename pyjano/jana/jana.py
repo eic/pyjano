@@ -426,9 +426,17 @@ class Jana(object):
         # Build plugins?
         for plugin in self.config['plugins'].values():
             if isinstance(plugin, PluginFromSource):
-                plugin.builder.cmake_configure()
-                plugin.builder.build()
+                do_str = "CMake configuration"
+                try:
+                    plugin.builder.cmake_configure(retval_raise=True)
+                    do_str = "compilation"
+                    plugin.builder.build(retval_raise=True)
+                except RuntimeError:
+                    self.sink.add_line(f"[FATAL] during plugin '{plugin.name}' {do_str}. Look at logs/output for details")
+                    return
 
+
+        self.sink.to_show = ["%]", "event", "ERROR", "FATAL"]  # "[" - Cmake like "[9%]"
         command = f"""{self.exec_path} {self.get_run_command()} -Pjana:debug_plugin_loading=1 """
         self.sink.show_running_command(command)
 

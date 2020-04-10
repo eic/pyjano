@@ -202,3 +202,7 @@ env\.csh
 env\.sh
 
 *.root
+
+tests/beagle_eD.txt
+
+beagle_eD.txt
