@@ -435,8 +435,18 @@ class Jana(object):
                     self.sink.add_line(f"[FATAL] during plugin '{plugin.name}' {do_str}. Look at logs/output for details")
                     return
 
+        # apply to_show for ejana
+        self.sink.to_show = [
+                    'Initializing plugin',
+                    'Start processing',
+                    'Completed events',
+                    'ERROR',
+                    'FATAL',
+                    '[INFO] Status:',
+                    '[INFO] Start',
+                    '[INFO] JPluginLoader',
+                ]
 
-        self.sink.to_show = ["%]", "event", "ERROR", "FATAL"]  # "[" - Cmake like "[9%]"
         command = f"""{self.exec_path} {self.get_run_command()} -Pjana:debug_plugin_loading=1 """
         self.sink.show_running_command(command)
 

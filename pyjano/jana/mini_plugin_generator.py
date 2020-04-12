@@ -56,13 +56,15 @@ public:
         for(auto& particle: particles) {
 
             // select electron
-            if(std::abs(particle->pdg) == 11 && particle->charge < 0) {
-                ROOT::Math::PxPyPzMVector p(particle->px, particle->py, particle->pz, particle->m);
-                h1d_pt->Fill(p.pt());
+            if(std::abs(particle->pdg) != 11) continue;
+            if(particle->charge != -1) continue;
+            if(!particle->is_stable) continue; 
+            
+            ROOT::Math::PxPyPzMVector p(particle->px, particle->py, particle->pz, particle->m);
+            h1d_pt->Fill(p.pt());
 
-                if(m_verbose == 2) {
-                    fmt::print("e e={}  pt = {}  theta = {} \\n",particles.size(), p.pt(), p.theta()*180/3.1415);
-                }
+            if(m_verbose == 2) {
+                fmt::print("e E = {:<15}  pt = {:<15}  theta = {:<15.1f} \\n", p.e(), p.pt(), p.theta()*180/3.1415);
             }
         }
     }

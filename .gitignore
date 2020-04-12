@@ -206,3 +206,5 @@ env\.sh
 tests/beagle_eD.txt
 
 beagle_eD.txt
+
+tests/test_mini_plugin/
