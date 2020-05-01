@@ -4,14 +4,10 @@ Jana(nthreads=10, )
 """
 import os
 
-from IPython.display import display, Javascript, clear_output, HTML
-from ipywidgets import Button, IntProgress, HBox, widgets
-
-from IPython import get_ipython
 
 import escrun
 from escrun.console_run_sink import ConsoleRunSink
-from escrun.notebook_run_sink import NotebookRunSink
+
 
 
 #
@@ -164,6 +160,7 @@ class Jana(object):
         else:
             self.is_notebook = is_notebook()
             if (gui == 'auto' and self.is_notebook) or gui == 'notebook':
+                from escrun.notebook_run_sink import NotebookRunSink
                 self.sink = NotebookRunSink()
             else:
                 self.sink = ConsoleRunSink()

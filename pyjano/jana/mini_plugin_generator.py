@@ -1,6 +1,104 @@
 import os
 
-mini_plugin_cpp = """
+mini_smear_analysis = """
+#include <JANA/JEventProcessor.h>
+#include <JANA/Services/JGlobalRootLock.h>
+#include <TH1D.h>
+#include <TFile.h>
+#include <Math/Vector4D.h>
+#include <ejana/MainOutputRootFile.h>
+#include <MinimalistModel/McGeneratedParticle.h>
+#include <fmt/core.h>
+
+
+class {{class_name}}Processor: public JEventProcessor {
+private:
+    std::shared_ptr<ej::MainOutputRootFile> m_file;
+    int m_verbose;                /// verbosity level. 0-none, 1-some, 2-all
+    TDirectory* m_plugin_dir;     /// Virtual sub-folder inside root file used for this specific plugin
+
+    /// Declare histograms here
+    TH1D* h1d_pt;
+
+public:
+    explicit {{class_name}}Processor() {
+    }
+
+    void Init() override {
+        auto app = GetApplication();
+
+        // Get main ROOT output file 
+        m_file = app->GetService<ej::MainOutputRootFile>();
+
+        // Set parameters that can be controlled from command line
+        m_verbose = 1;
+        app->SetDefaultParameter("{{plugin_name}}:verbose", m_verbose, "Verbosity level 0=none, 1=some, 2=all");
+
+        if(m_verbose) {
+            fmt::print("{{class_name}}Processor::Init()\\n  {{plugin_name}}:verbose={}\\n", m_verbose);
+        }
+
+        // Setup histograms
+        m_plugin_dir = m_file->mkdir("{{plugin_name}}"); // Create a subdir inside dest_file for these results
+        m_plugin_dir->cd();
+        h1d_pt = new TH1D("e_pt", "electron pt", 100,0,10);
+    }
+
+    void Process(const std::shared_ptr<const JEvent>& event) override {
+        // This function is called every event
+        if(m_verbose == 2) fmt::print("Begin of event {} \\n", event->GetEventNumber());
+
+        // Check if smearing factory exists and take particles from smearing factory
+        bool has_smearing = event->GetFactory<minimodel::McGeneratedParticle>("smear"); 
+        auto particles = has_smearing 
+                         ? event->Get<minimodel::McGeneratedParticle>("smear")
+                         : event->Get<minimodel::McGeneratedParticle>();
+
+        // Acquire any results you need for your analysis
+         event->Get<minimodel::McGeneratedParticle>();
+
+        // Go through particles
+        for(auto& particle: particles) {
+
+            // select electron
+            if(std::abs(particle->pdg) != 11) continue;            
+            if(!particle->is_stable) continue;
+             
+            // smearing check, that particle has momentum
+            // First, if particle has smearing it has
+            // gen_part->has_smear_info == true
+            // So if particle is smeared we ask it to have momentum smeared
+            if(gen_part->has_smear_info && !particle->smear.has_p) continue;
+            
+            // Smeared values
+            ROOT::Math::PxPyPzMVector p(particle->px, particle->py, particle->pz, particle->m);
+            
+            // Original values
+            ROOT::Math::PxPyPzMVector orig_p(particle->smear.orig_px, particle->smear.orig_py, particle->smear.orig_pz, particle->m);
+        
+            // Fill histogram   
+            h1d_pt->Fill(p.pt());
+
+            if(m_verbose == 2) {
+                fmt::print("e E = {:<15}  pt = {:<15}  theta = {:<15.1f} \\n", p.e(), p.pt(), p.theta()*180/3.1415);
+            }
+        }
+    }
+
+    void Finish() override {
+        fmt::print("{{class_name}}Processor::Finish(). Cleanup\\n");
+    }
+};
+
+extern "C" {
+    void InitPlugin(JApplication *app) {
+        InitJANAPlugin(app);
+        app->Add(new {{class_name}}Processor);
+    }
+}
+"""
+
+mini_analysis_cpp = """
 #include <JANA/JEventProcessor.h>
 #include <JANA/Services/JGlobalRootLock.h>
 #include <TH1D.h>
@@ -88,7 +186,7 @@ mini_plugin_python_example = """
 #     pip install --upgrade pyjano          # for conda, venv or root install
 #     pip install --user --upgrade pyjano   # for user local install
 #
-#
+# Please, wget 
 from pyjano.jana import Jana, PluginFromSource
 
 my_plugin = PluginFromSource('./', name='{{plugin_name}}')
@@ -220,7 +318,7 @@ ejana
 """
 
 
-def generate_mini_plugin(plugin_name, class_name, path=""):
+def generate_mini_analysis_plugin(plugin_name, class_name, path=""):
     """Generates mini plugin"""
     plugin_dir = os.path.join(path, plugin_name) if path else plugin_name
     os.makedirs(plugin_dir, exist_ok=False)
@@ -232,7 +330,7 @@ def generate_mini_plugin(plugin_name, class_name, path=""):
                 .replace("{{class_name}}", class_name))
 
     with open(os.path.join(plugin_dir, class_name+".cc"), "w+") as f:
-        f.write(mini_plugin_cpp
+        f.write(mini_analysis_cpp
                 .replace("{{plugin_name}}", plugin_name)
                 .replace("{{class_name}}", class_name))
 

@@ -6,6 +6,7 @@ import wget
 from pyjano.jana.generator import generate_mini_plugin
 from pyjano.jana import Jana, PluginFromSource
 
+
 class MyTestCase(unittest.TestCase):
 
     def setUp(self) -> None:

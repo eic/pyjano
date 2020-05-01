@@ -24,7 +24,7 @@ pip install --upgrade pip
 pip install --upgrade setuptools wheel twine
 
 #if bug with setuptools
-pip install --upgrade --force-reinstall setuptools
+rm 
 
 python setup.py sdist bdist_wheel
 

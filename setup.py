@@ -29,12 +29,13 @@ setup(
         'Development Status :: 3 - Alpha',
 
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
     ],
     packages=["pyjano", "escrun"],
+    package_data={'pyjano': ['pyjano/server/templates/*.html',
+                             'pyjano/server/static/*.*'
+                       ]},
     include_package_data=True,
 #    setup_requires=["click", "appdirs"],
 #    install_requires=["click", "appdirs"],
