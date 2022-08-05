@@ -14,10 +14,10 @@ with open(os.path.join(this_script_dir, "pip_readme.md"), 'r') as readme_file:
 setup(
     name="pyjano",
     version=pyjano_version,
-    description="JANA2 api and control through python",
+    description="JANA2 python control tool",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://gitlab.com/eic/janapy",
+    url="https://github.com/eic/pyjano",
     author="Dmitry Romanov",
     author_email="romanov@jlab.org",
     license="MIT",

@@ -6,12 +6,13 @@ Pyjano stands for **Py**thon **Jan**a **O**rchestrator. Python wrapper over
 [jana2](https://github.com/JeffersonLab/JANA2) framework to make configuration
  and running convenient. 
 
+**Install**
 
 ```bash
-pip install pyjano
+python3 -m pip install pyjano    # use --user for user level install
 ```
 
-Usage:
+Simple configuration
 
 ```python
 from pyjano.jana import Jana
@@ -27,3 +28,5 @@ jana.plugin('beagle_reader')\
 # Run
 jana.run()
 ```
+
+Custom executable
