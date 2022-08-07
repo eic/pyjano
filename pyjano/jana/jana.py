@@ -201,16 +201,15 @@ class Jana(object):
         # print(os.environ['JANA_PLUGIN_PATH'])
         self._environ_is_updated = True
 
-    def configure_plugin_paths(self, plugin_paths):
+    def add_plugin_paths(self, plugin_paths):
         """Set additional paths where JANA looks for plugins"""
         # The later plugin location will have greater load priority
         # This means that it must be earlier in the list
-        for path in plugin_paths:
-            try:
-                self.plugin_search_paths.remove(path)
-            except ValueError:
-                pass  # no such path
 
+        if isinstance(plugin_paths, str):
+            plugin_paths = [plugin_paths]
+
+        for path in plugin_paths:
             self.plugin_search_paths.insert(0, path)
 
         self._environ_is_updated = False
@@ -365,7 +364,7 @@ class Jana(object):
             self.config['input_files'] = files
 
         if plugin_paths:
-            self.configure_plugin_paths(plugin_paths)
+            self.add_plugin_paths(plugin_paths)
 
         # noinspection PyTypeChecker
         if self.is_notebook:
