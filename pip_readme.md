@@ -3,7 +3,7 @@
 
 ![Pyjano](logo.png) 
 
-Pyjano stands for **Py**thon **Jan**a **O**rchestrator. Python wrapper over 
+Pyjano stands for **Py**thon **Jan**a2 **O**rchestrator. Python wrapper over 
 [jana2](https://github.com/JeffersonLab/JANA2) framework to make configuration
  and running convenient. 
 
